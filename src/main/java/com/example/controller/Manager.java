@@ -8,10 +8,12 @@ import java.io.IOException;
 public class Manager {
 
     public void testResult(){
-        File file = new File("");
         try {
-            System.out.println(file.getAbsolutePath());
-            Runtime.getRuntime().exec("source ../SE-Experiment-master/tests/IntegrationTest/test.sh");
+            File file1 = new File("");
+            System.out.println(file1.getAbsolutePath());
+            Runtime.getRuntime().exec("cd ../SE-Experiment-master/tests/IntegrationTest/");
+            File file2 = new File("");
+            System.out.println(file2.getAbsolutePath());
         }catch (IOException e){
             e.printStackTrace();
         }
