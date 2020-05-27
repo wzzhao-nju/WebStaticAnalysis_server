@@ -2,10 +2,7 @@ package com.example.controller;
 
 import com.example.message.Result;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class Manager {
 
@@ -20,12 +17,12 @@ public class Manager {
         }
     }
 
-    public void getResult(String savepath, String filename) {
+    public void getResult(String filename) {
         try {
-            Runtime.getRuntime().exec("cd " + savepath);
             Runtime.getRuntime().exec("clang++ -emit-ast -c " + filename);
-            String astfilename = filename.substring(0, filename.lastIndexOf('.')) + ".ast";
-            Runtime.getRuntime().exec("");
+            FileWriter writer = new FileWriter("astList.txt", false);
+            writer.write(filename.substring(0, filename.lastIndexOf('.')) + ".ast");
+            Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker astList.txt config.txt");
         }catch (IOException e){
             e.printStackTrace();
         }
