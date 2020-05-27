@@ -19,7 +19,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 @RestController
 public class Controller {
 
-    private final String savepath = "../toAnalyze";
+    private final String savepath = "";
     private static final Logger log = LoggerFactory.getLogger(Controller.class); //用于输出信息
 
     //传输代码字符串
@@ -71,10 +71,10 @@ public class Controller {
         log.info(String.format("Logger: download %s finished!\n", filename));
         return new Message(0, filename);
     }
-/*
+
     @PostMapping("/api/getResult")
-    public Result testResult(@RequestBody FileName filename) {
-        return new Manager().testResult(savepath, filename.getFilename());
-    }*/
+    public void testResult(@RequestBody FileName filename) {
+        new Manager().getResult(filename.getFilename());
+    }
 
 }
