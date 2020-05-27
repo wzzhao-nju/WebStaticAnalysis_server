@@ -8,9 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AnalyzerApplication {
 
 	public static void main(String[] args) {
-		//SpringApplication.run(AnalyzerApplication.class, args);
 		Manager manager = new Manager();
 		manager.testResult();
+		SpringApplication.run(AnalyzerApplication.class, args);
 	}
 
 }
