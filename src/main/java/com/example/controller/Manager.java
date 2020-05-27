@@ -2,15 +2,17 @@ package com.example.controller;
 
 import com.example.message.Result;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Manager {
 
     public void testResult(){
         try {
-            Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker " +
-                    "astList.txt config.txt");
+            //Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker astList.txt config.txt");
+            Runtime.getRuntime().exec("clang++ -emit-c -ast ../SE-Experiment-master/tests/IntegrationTest/CompareChecker.cpp");
         }catch (IOException e){
             e.printStackTrace();
         }
