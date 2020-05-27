@@ -9,7 +9,7 @@ public class Manager {
 
     public void testResult(){
         try {
-            Runtime.getRuntime().exec("./../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker " +
+            Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker " +
                     "astList.txt config.txt");
         }catch (IOException e){
             e.printStackTrace();
