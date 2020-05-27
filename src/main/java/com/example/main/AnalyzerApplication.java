@@ -11,7 +11,7 @@ public class AnalyzerApplication {
 		System.out.print("main start\n");
 		Manager manager = new Manager();
 		manager.testResult();
-		SpringApplication.run(AnalyzerApplication.class, args);
+		//SpringApplication.run(AnalyzerApplication.class, args);
 	}
 
 }

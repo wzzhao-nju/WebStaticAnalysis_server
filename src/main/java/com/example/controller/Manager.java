@@ -2,14 +2,16 @@ package com.example.controller;
 
 import com.example.message.Result;
 
+import java.io.File;
 import java.io.IOException;
 
 public class Manager {
 
     public void testResult(){
+        File file = new File("");
         try {
-            Runtime.getRuntime().exec("cd ../SE-Experiment-master/tests/IntegrationTest");
-            Runtime.getRuntime().exec("source test.sh");
+            System.out.println(file.getAbsolutePath());
+            Runtime.getRuntime().exec("source ../SE-Experiment-master/tests/IntegrationTest/test.sh");
         }catch (IOException e){
             e.printStackTrace();
         }
