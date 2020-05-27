@@ -9,11 +9,8 @@ public class Manager {
 
     public void testResult(){
         try {
-            File file1 = new File("");
-            System.out.println(file1.getAbsolutePath());
-            Runtime.getRuntime().exec("cd ../SE-Experiment-master/tests/IntegrationTest/");
-            File file2 = new File("");
-            System.out.println(file2.getAbsolutePath());
+            Runtime.getRuntime().exec("./../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker " +
+                    "astList.txt config.txt");
         }catch (IOException e){
             e.printStackTrace();
         }
