@@ -12,7 +12,7 @@ public class Manager {
     public void testResult(){
         try {
             //Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker astList.txt config.txt");
-            Runtime.getRuntime().exec("clang++ -emit-c -ast ../SE-Experiment-master/tests/IntegrationTest/CompareChecker.cpp");
+            Runtime.getRuntime().exec("clang++ -emit-ast -c ../SE-Experiment-master/tests/IntegrationTest/CompareChecker.cpp");
         }catch (IOException e){
             e.printStackTrace();
         }
