@@ -41,7 +41,7 @@ public class Controller {
 
     //传输文件 todo 多线程
     @PostMapping("/api/uploadFile")
-    public Message testFile(@RequestParam(value = "file") MultipartFile upload) throws Exception{
+    public Message testFile(@RequestParam(value = "file") MultipartFile upload){
         String filename = upload.getOriginalFilename();
         //文件名不能为空，避免服务器崩溃
         if(filename == null){
@@ -62,7 +62,7 @@ public class Controller {
         try{
             log.info(String.format("Logger: Starting to restore file %s", filename));
             File dst = new File(savepath + filename);
-            upload.transferTo(dst);
+            upload.transferTo(dst.getAbsoluteFile());
         } catch (IOException e){
             log.info(String.format("Logger: restore file %s failed", filename));
             e.printStackTrace();
