@@ -20,13 +20,11 @@ public class Manager {
     public void getResult(String filename) {
         try {
             Runtime runtime = Runtime.getRuntime();
-            Process temp = runtime.exec("clang++ -emit-ast -c " + filename);
-            System.out.print(temp.waitFor());
+            runtime.exec("clang++ -emit-ast -c " + filename).waitFor();
             FileWriter writer = new FileWriter("astList.txt", false);
             writer.write(filename.substring(0, filename.lastIndexOf('.')) + ".ast");
             writer.close();
-            Process p = runtime.exec(new String[]{"../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker", "astList.txt", "config.txt"});
-            System.out.print(p.waitFor());
+            runtime.exec(new String[]{"../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker", "astList.txt", "config.txt"}).waitFor();
         }catch (IOException | InterruptedException e){
             e.printStackTrace();
         }
