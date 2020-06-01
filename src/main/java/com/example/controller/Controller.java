@@ -27,7 +27,7 @@ public class Controller {
     public Message Post(@RequestBody CodeLine codeline){
         //对字符串进行转存
         String[] code = codeline.getCodeline().split("\n");
-        String filename = RandomStringUtils.randomAlphabetic(16) + ".cpp"; //由于没有文件名，这里随机生成一个 todo 注册系统上线后，改成 用户名+时间
+        String filename = RandomStringUtils.randomAlphabetic(8) + ".cpp"; //由于没有文件名，这里随机生成一个 todo 注册系统上线后，改成 用户名+时间
         try {
             FileWriter writer = new FileWriter(savepath + filename);
             for (String s : code)
