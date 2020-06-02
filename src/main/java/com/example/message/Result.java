@@ -9,6 +9,7 @@ public class Result {
     private final Vector<Error> errors;
 
     public Result() {
+        error_count = 0;
         errors = new Vector<Error>();
     }
 
@@ -22,6 +23,7 @@ public class Result {
 
     public void append(Error error) {
         this.errors.add(error);
+        error_count++;
     }
 
     public String getFilename() {

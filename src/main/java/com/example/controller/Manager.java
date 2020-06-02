@@ -1,13 +1,16 @@
 package com.example.controller;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Vector;
 
+import com.example.json.Defect;
+import com.example.json.DefectIntheSameFile;
 import com.example.json.Report;
 import com.example.message.Result;
+import com.example.message.Error;
+import com.example.message.Line;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,9 +29,17 @@ public class Manager {
     public void getResult(String savepath, String identity, Vector<String> filenames) {
         //savepath是代码的存储路径，identity是文件夹名称，filenames是所有要检测的文件
         run(savepath, identity, filenames);
+        //转存所有缺陷，与Checker内容无关
         ArrayList<Report> reports = readJson(savepath + identity + "/" + identity + ".json");
+        Vector<Defect> defects = new Vector<>();
+        for(Report report: reports)
+            defects.addAll(report.getDefects());
+        //对所有缺陷按文件进行排序
+        Collections.sort(defects);
+        //todo 将defects按文件分类
+        DefectIntheSameFile disf = new DefectIntheSameFile();
 
-        Result rst = new Result();
+        //Result rst = readFile(defects);
     }
 
     //系统调用
@@ -52,7 +63,7 @@ public class Manager {
         try {
             FileWriter ast_writer = new FileWriter(workpath + astlistFilename, false);
             for(String filename:filenames)
-                ast_writer.write(filename.substring(filename.lastIndexOf('/'), filename.lastIndexOf('.')) + ".ast\n");
+                ast_writer.write(filename.substring(filename.lastIndexOf('/') + 1, filename.lastIndexOf('.')) + ".ast\n");
             ast_writer.close();
             FileWriter cfg_writer = new FileWriter(workpath + configFilename, false);
             for (String someConfig : someConfigs)
@@ -79,6 +90,67 @@ public class Manager {
             e.printStackTrace();
         }
         return reports;
+    }
+
+    //将defects按文件进行分类
+    public Vector<DefectIntheSameFile> classify(Vector<Defect> defects, String identity){
+        Vector<DefectIntheSameFile> disfs = new Vector<>();
+        int i = 0;
+        do{
+            DefectIntheSameFile disf = new DefectIntheSameFile();
+            for(; i < defects.size(); i++){
+                String location = defects.elementAt(i).getLocation();
+                String filename = location.substring(location.indexOf(identity) + identity.length() + 1, location.indexOf(':'));
+                Integer lineNo = Integer.parseInt(location.substring(location.indexOf(':') + 1, location.lastIndexOf(':')));
+                if(disf.isEmpty()){
+                    disf.setFilename(filename);
+                    disf.append(lineNo);
+                }else if(disf.getFilename().equals(filename)){
+                    disf.append(lineNo);
+                }else {
+                    disfs.add(disf);
+                    break;
+                }
+            }
+        }while (i < defects.size());
+        return disfs;
+    }
+
+    //读取和defects相关的缺陷信息(如缺陷上下文)
+    public Result readFile(Vector<Defect> defects){
+        Result result = new Result();
+        for(Defect defect: defects){
+            String location = defect.getLocation();
+            String filename = location.substring(0, location.indexOf(':'));
+            Error error = new Error();
+            int startNo = Integer.parseInt(location.substring(location.indexOf(':') + 1, location.lastIndexOf(':')));
+            int endNo = startNo;
+            error.setStart_line(startNo);
+            error.setEnd_line(endNo);
+            error.setError_info(defect.getInfo());
+            try {
+                File file = new File(filename);
+                FileReader in = new FileReader(file);
+                LineNumberReader reader = new LineNumberReader(in);
+                for(int i = startNo - 3; i <= endNo + 3; i++){
+                    if(i <= 0)
+                        continue;
+                    reader.setLineNumber(i);
+                    if(i < startNo)
+                        error.push_before(new Line(i, reader.readLine()));
+                    else if(i > endNo)
+                        error.push_after(new Line(i, reader.readLine()));
+                    else
+                        error.push_rightIn(new Line(i, reader.readLine()));
+                }
+                reader.close();
+                in.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+            result.append(error);
+        }
+        return result;
     }
 }
 

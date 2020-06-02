@@ -1,6 +1,6 @@
 package com.example.json;
 
-public class Defect {
+public class Defect implements Comparable<Defect>{
     private String location;
     private String info;
 
@@ -18,5 +18,9 @@ public class Defect {
 
     public String getInfo() {
         return info;
+    }
+
+    public int compareTo(Defect defect){
+        return this.location.compareTo(defect.location);
     }
 }
