@@ -116,7 +116,7 @@ public class Controller {
     public void testResult(@RequestBody Identity identity) {
         String id = identity.getIdentity();
         if(identity_filename.containsKey(id)){
-            
+            new Manager().getResult(savepath, id, identity_filename.get(id));
         }
         //new Manager().getResult(filename.getFilename());
     }

@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Vector;
 
-import com.example.json.Result;
+import com.example.json.Report;
+import com.example.message.Result;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -21,40 +23,43 @@ public class Manager {
             "\tdivideChecker = false", "\tmemoryOPChecker = false", "}", "Framework", "{",
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
-    public void getResult(String filename) {
-        //filename不带路径
-        //这个方法中调用的其他方法时传递的参数filename均不带文件扩展名，也不带路径
-        String subfilename = filename.substring(0, filename.lastIndexOf('.'));
-        run(subfilename);
-        ArrayList<Result> results = readJson(subfilename);
+    public void getResult(String savepath, String identity, Vector<String> filenames) {
+        //savepath是代码的存储路径，identity是文件夹名称，filenames是所有要检测的文件
+        run(savepath, identity, filenames);
+        ArrayList<Report> reports = readJson(savepath + identity + "/" + identity + ".json");
+
+        Result rst = new Result();
     }
 
     //系统调用
-    public void run(String filename){
+    public void run(String savepath, String identity, Vector<String> filenames){
+        String workpath = savepath + identity + "/";
         try {
             Runtime runtime = Runtime.getRuntime();
-            runtime.exec("clang++ -emit-ast -c " + filename + ".cpp").waitFor();
-            writeAstlistAndConfig(filename);
-            runtime.exec(new String[]{"../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker",
-                    astlistFilename, configFilename}).waitFor();
+            for(String filename: filenames)
+                runtime.exec(new String[]{"clang++", "-emit-ast", "-c", filename}, null, new File(workpath)).waitFor();
+            writeAstlistAndConfig(savepath, identity, filenames);
+            runtime.exec(new String[]{"../../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker",
+                    astlistFilename, configFilename}, null, new File(workpath)).waitFor();
         }catch (IOException | InterruptedException e){
             e.printStackTrace();
         }
     }
 
     //写缺陷检测程序的相关依赖(astList和config)
-    public void writeAstlistAndConfig(String filename) {
+    public void writeAstlistAndConfig(String savepath, String identity, Vector<String> filenames) {
+        String workpath = savepath + identity + "/";
         try {
-            FileWriter ast_writer = new FileWriter(astlistFilename, false);
-            ast_writer.write(filename + ".ast");
+            FileWriter ast_writer = new FileWriter(workpath + astlistFilename, false);
+            for(String filename:filenames)
+                ast_writer.write(filename.substring(filename.lastIndexOf('/'), filename.lastIndexOf('.')) + ".ast\n");
             ast_writer.close();
-            FileWriter cfg_writer = new FileWriter(configFilename, false);
+            FileWriter cfg_writer = new FileWriter(workpath + configFilename, false);
             for (String someConfig : someConfigs)
                 cfg_writer.write(someConfig + "\n");
-            //目前暂定json结果文件和filename相同，保存在当前目录下 todo 后续改进工作
             cfg_writer.write("FileSettings\n");
             cfg_writer.write("{\n");
-            cfg_writer.write("\tReportFileName = " + filename + "\n");
+            cfg_writer.write("\tReportFileName = " + identity + "\n");
             cfg_writer.write("}\n");
             cfg_writer.close();
         }catch (IOException e){
@@ -63,17 +68,17 @@ public class Manager {
     }
 
     //读取并解析json结果报告
-    public ArrayList<Result> readJson(String jsonFilename){
+    public ArrayList<Report> readJson(String jsonFilename){
         ObjectMapper mapper = new ObjectMapper();
         File jsonFile = new File(jsonFilename + ".json");
-        ArrayList<Result> results = new ArrayList<>();
+        ArrayList<Report> reports = new ArrayList<>();
         try {
-            JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, Result.class);
-            results = mapper.readValue(jsonFile, type);
+            JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, Report.class);
+            reports = mapper.readValue(jsonFile, type);
         }catch (IOException e) {
             e.printStackTrace();
         }
-        return results;
+        return reports;
     }
 }
 

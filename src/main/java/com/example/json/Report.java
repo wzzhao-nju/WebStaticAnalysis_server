@@ -2,7 +2,7 @@ package com.example.json;
 
 import java.util.Vector;
 
-public class Result {
+public class Report {
     private String checkerName;
     private Vector<Defect> defects;
 
