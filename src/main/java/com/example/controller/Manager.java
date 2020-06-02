@@ -26,20 +26,26 @@ public class Manager {
             "\tdivideChecker = false", "\tmemoryOPChecker = false", "}", "Framework", "{",
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
-    public void getResult(String savepath, String identity, Vector<String> filenames) {
+    public Vector<Result> getResult(String savepath, String identity, Vector<String> filenames) {
         //savepath是代码的存储路径，identity是文件夹名称，filenames是所有要检测的文件
         run(savepath, identity, filenames);
-        //转存所有缺陷，与Checker内容无关
+        //转存所有缺陷，与Checker无关
         ArrayList<Report> reports = readJson(savepath + identity + "/" + identity + ".json");
         Vector<Defect> defects = new Vector<>();
         for(Report report: reports)
             defects.addAll(report.getDefects());
         //对所有缺陷按文件进行排序
         Collections.sort(defects);
-        //todo 将defects按文件分类
-        DefectIntheSameFile disf = new DefectIntheSameFile();
-
-        //Result rst = readFile(defects);
+        //将defects按照文件分类
+        Vector<DefectIntheSameFile> disfs = classify(defects, identity);
+        //逐个文件收集缺陷信息
+        Vector<Result> results = new Vector<>();
+        for(DefectIntheSameFile disf: disfs) {
+            Result result = readFile(disf.getDefects());
+            result.setFilename(disf.getFilename());
+            results.add(result);
+        }
+        return results;
     }
 
     //系统调用
@@ -101,12 +107,11 @@ public class Manager {
             for(; i < defects.size(); i++){
                 String location = defects.elementAt(i).getLocation();
                 String filename = location.substring(location.indexOf(identity) + identity.length() + 1, location.indexOf(':'));
-                Integer lineNo = Integer.parseInt(location.substring(location.indexOf(':') + 1, location.lastIndexOf(':')));
                 if(disf.isEmpty()){
                     disf.setFilename(filename);
-                    disf.append(lineNo);
+                    disf.append(defects.elementAt(i));
                 }else if(disf.getFilename().equals(filename)){
-                    disf.append(lineNo);
+                    disf.append(defects.elementAt(i));
                 }else {
                     disfs.add(disf);
                     break;
@@ -115,8 +120,41 @@ public class Manager {
         }while (i < defects.size());
         return disfs;
     }
-
+/*
     //读取和defects相关的缺陷信息(如缺陷上下文)
+    public Result readFile(DefectIntheSameFile disf, String workpath){
+        Result result = new Result();
+        String filename = disf.getFilename();
+        Vector<Integer> lineNos = disf.getLineNo();
+        try{
+            File file = new File(workpath + filename);
+            FileReader in = new FileReader(file);
+            LineNumberReader reader = new LineNumberReader(in);
+            for(Integer lineNo: lineNos){
+                Integer startNo = lineNo;
+                Integer endNo = lineNo;
+                Error error = new Error();
+                error.setStart_line(startNo);
+                error.setEnd_line(endNo);
+                error.setError_info();
+                for(int i = startNo - 3; i <= endNo + 3; i++){
+                    if(i < 0)
+                        continue;
+                    reader.setLineNumber(i);
+                    if(i < startNo)
+                        error.push_before(new Line(i, reader.readLine()));
+                    else if(i > endNo)
+                        error.push_after(new Line(i, reader.readLine()));
+                    else
+                        error.push_rightIn(new Line(i, reader.readLine()));
+                }
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return result;
+    }*/
+
     public Result readFile(Vector<Defect> defects){
         Result result = new Result();
         for(Defect defect: defects){
@@ -152,6 +190,7 @@ public class Manager {
         }
         return result;
     }
+
 }
 
 //用完就删
