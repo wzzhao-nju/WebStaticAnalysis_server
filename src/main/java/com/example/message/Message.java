@@ -3,18 +3,18 @@ package com.example.message;
 //send message to client when receive something(code or file)
 public class Message {
     private int stateCode;//0 means success, -1 means error
-    private String filename;
+    private String identity;
     private String errorInfo;
 
-    public Message(int stateCode, String filename){
+    public Message(int stateCode, String identity){
         this.stateCode = stateCode;
-        this.filename = filename;
+        this.identity = identity;
         this.errorInfo = null;
     }
 
-    public Message(int stateCode, String filename, String errorInfo) {
+    public Message(int stateCode, String identity, String errorInfo) {
         this.stateCode = stateCode;
-        this.filename = filename;
+        this.identity = identity;
         this.errorInfo = errorInfo;
     }
 
@@ -22,8 +22,8 @@ public class Message {
         this.stateCode = stateCode;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setIdentity(String identity) {
+        this.identity = identity;
     }
 
     public void setErrorInfo(String errorInfo) {
@@ -34,8 +34,8 @@ public class Message {
         return stateCode;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getIdentity() {
+        return identity;
     }
 
     public String getErrorInfo() {

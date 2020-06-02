@@ -1,8 +1,12 @@
 package com.example.controller;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
+import com.example.json.Result;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 //该类主要实现对缺陷检测程序的调用，读取结果后，生成json报文返回给Controller，再由Controller返回给前端
@@ -18,9 +22,18 @@ public class Manager {
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
     public void getResult(String filename) {
+        //filename不带路径
+        //这个方法中调用的其他方法时传递的参数filename均不带文件扩展名，也不带路径
+        String subfilename = filename.substring(0, filename.lastIndexOf('.'));
+        run(subfilename);
+        ArrayList<Result> results = readJson(subfilename);
+    }
+
+    //系统调用
+    public void run(String filename){
         try {
             Runtime runtime = Runtime.getRuntime();
-            runtime.exec("clang++ -emit-ast -c " + filename).waitFor();
+            runtime.exec("clang++ -emit-ast -c " + filename + ".cpp").waitFor();
             writeAstlistAndConfig(filename);
             runtime.exec(new String[]{"../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker",
                     astlistFilename, configFilename}).waitFor();
@@ -29,10 +42,11 @@ public class Manager {
         }
     }
 
+    //写缺陷检测程序的相关依赖(astList和config)
     public void writeAstlistAndConfig(String filename) {
         try {
             FileWriter ast_writer = new FileWriter(astlistFilename, false);
-            ast_writer.write(filename.substring(0, filename.lastIndexOf('.')) + ".ast");
+            ast_writer.write(filename + ".ast");
             ast_writer.close();
             FileWriter cfg_writer = new FileWriter(configFilename, false);
             for (String someConfig : someConfigs)
@@ -48,9 +62,18 @@ public class Manager {
         }
     }
 
-    public void readJson(){
+    //读取并解析json结果报告
+    public ArrayList<Result> readJson(String jsonFilename){
         ObjectMapper mapper = new ObjectMapper();
-        //List<Result> results = mapper.readValue(%File, Result.class);
+        File jsonFile = new File(jsonFilename + ".json");
+        ArrayList<Result> results = new ArrayList<>();
+        try {
+            JavaType type = mapper.getTypeFactory().constructCollectionType(ArrayList.class, Result.class);
+            results = mapper.readValue(jsonFile, type);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return results;
     }
 }
 

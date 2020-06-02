@@ -12,7 +12,7 @@ public class AnalyzerApplication {
 
 	public static void main(String[] args) {
 		//Manager manager = new Manager();
-		//manager.getResult("test.cpp");
+		//manager.readJson("reference");
 		SpringApplication.run(AnalyzerApplication.class, args);
 	}
 
