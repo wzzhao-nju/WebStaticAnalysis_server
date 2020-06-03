@@ -120,7 +120,7 @@ public class Controller {
         Vector<Result> results= new Vector<>();
         if(identity_filename.containsKey(id)){
             results = new Manager().getResult(savepath, id, identity_filename.get(id));
-            identity_filename.remove(id);
+            //identity_filename.remove(id);
         }
         return results;
     }
