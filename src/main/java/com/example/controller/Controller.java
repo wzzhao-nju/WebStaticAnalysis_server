@@ -11,7 +11,7 @@ import java.util.Vector;
 import com.example.message.Message;
 import com.example.message.Result;
 import com.example.misc.CodeLine;
-import com.example.misc.Identity;
+import com.example.misc.AnalyzeID;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.lang3.RandomStringUtils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -113,8 +112,8 @@ public class Controller {
     }
 
     @PostMapping("/api/getResult")
-    public Vector<Result> testResult(@RequestBody Identity identity) {
-        String id = identity.getIdentity();
+    public Vector<Result> testResult(@RequestBody AnalyzeID analyzeID) {
+        String id = analyzeID.getAnalyzeID();
         Vector<Result> results= new Vector<>();
         if(identity_filename.containsKey(id)){
             results = new Manager().getResult(savepath, id, identity_filename.get(id));
