@@ -1,98 +1,34 @@
 [
     {
-        "checkerName": "CharArrayBound",
-        "defects": [
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CharArrayBound.cpp:8:3",
-                "info": "通过下标访问字符数组'\\0'之后的内容"
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CharArrayBound.cpp:10:3",
-                "info": "通过下标访问字符数组'\\0'之后的内容"
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CharArrayBound.cpp:18:5",
-                "info": "通过下标访问字符数组'\\0'之后的内容"
-            }
-        ]
-    },
-    {
         "checkerName": "CompareChecker",
         "defects": [
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:6:9",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:6:9",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CharArrayBound.cpp:17:19",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CharArrayBound.cpp:17:19",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:9:8",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:9:8",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:26:8",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:26:8",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:29:8",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:29:8",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:35:8",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:35:8",
                 "info": "比较运算中混用了有无符号数"
             },
             {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/CompareChecker.cpp:38:8",
+                "location": "C:/Users/MS1/Downloads/WebStaticAnalyzer-master/tests/IntegrationTest/CompareChecker.cpp:38:8",
                 "info": "比较运算中混用了有无符号数"
-            }
-        ]
-    },
-    {
-        "checkerName": "ZeroChecker",
-        "defects": [
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/ZeroChecker.cpp:4:6",
-                "info": "操作符/的右操作数是结果为0的常数表达式"
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/ZeroChecker.cpp:5:6",
-                "info": "操作符%的右操作数是结果为0的常数表达式"
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/ZeroChecker.cpp:7:7",
-                "info": "操作符/的右操作数是结果为0的常数表达式"
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/ZeroChecker.cpp:11:8",
-                "info": "操作符/的右操作数是结果为0的常数表达式"
-            }
-        ]
-    },
-    {
-        "checkerName": "SwitchChecker",
-        "defects": [
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/SwitchChecker.cpp:9:2",
-                "info": "存在尚未覆盖的枚举类型\nWed "
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/SwitchChecker.cpp:24:2",
-                "info": "存在尚未覆盖的枚举类型\nWed "
-            },
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/SwitchChecker.cpp:28:2",
-                "info": "存在尚未覆盖的枚举类型\nApr June "
-            }
-        ]
-    },
-    {
-        "checkerName": "LoopChecker",
-        "defects": [
-            {
-                "location": "/home/zwz/WebStaticAnalyzer/tests/IntegrationTest/LoopChecker.cpp:8:12",
-                "info": "存在可能的死循環"
             }
         ]
     }

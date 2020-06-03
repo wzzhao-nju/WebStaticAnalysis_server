@@ -127,40 +127,6 @@ public class Manager {
         }while (i < defects.size());
         return disfs;
     }
-/*
-    //读取和defects相关的缺陷信息(如缺陷上下文)
-    public Result readFile(DefectIntheSameFile disf, String workpath){
-        Result result = new Result();
-        String filename = disf.getFilename();
-        Vector<Integer> lineNos = disf.getLineNo();
-        try{
-            File file = new File(workpath + filename);
-            FileReader in = new FileReader(file);
-            LineNumberReader reader = new LineNumberReader(in);
-            for(Integer lineNo: lineNos){
-                Integer startNo = lineNo;
-                Integer endNo = lineNo;
-                Error error = new Error();
-                error.setStart_line(startNo);
-                error.setEnd_line(endNo);
-                error.setError_info();
-                for(int i = startNo - 3; i <= endNo + 3; i++){
-                    if(i < 0)
-                        continue;
-                    reader.setLineNumber(i);
-                    if(i < startNo)
-                        error.push_before(new Line(i, reader.readLine()));
-                    else if(i > endNo)
-                        error.push_after(new Line(i, reader.readLine()));
-                    else
-                        error.push_rightIn(new Line(i, reader.readLine()));
-                }
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-        return result;
-    }*/
 
     public Result readFile(Vector<Defect> defects){
         Result result = new Result();
@@ -178,15 +144,14 @@ public class Manager {
                 FileReader in = new FileReader(file);
                 LineNumberReader reader = new LineNumberReader(in);
                 for(int i = startNo - 3; i <= endNo + 3; i++){
-                    if(i <= 0)
+                    if(i < 0)
                         continue;
-                    reader.setLineNumber(i);
                     if(i < startNo)
-                        error.push_before(new Line(i, reader.readLine()));
+                        error.push_before(new Line(i, readLine(reader, i - 1)));
                     else if(i > endNo)
-                        error.push_after(new Line(i, reader.readLine()));
+                        error.push_after(new Line(i, readLine(reader, i - 1)));
                     else
-                        error.push_rightIn(new Line(i, reader.readLine()));
+                        error.push_rightIn(new Line(i, readLine(reader, i - 1)));
                 }
                 reader.close();
                 in.close();
@@ -196,6 +161,12 @@ public class Manager {
             result.append(error);
         }
         return result;
+    }
+
+    public String readLine(LineNumberReader reader, int lineNo) throws IOException {
+        while (reader.getLineNumber() < lineNo)
+            reader.readLine();
+        return reader.readLine();
     }
 
 }
