@@ -37,14 +37,17 @@ public class Controller {
     public Message Post(@RequestBody CodeLine codeline){
         //对字符串进行转存
         String[] code = codeline.getCodeline().split("\n");
-        String identity = UUID.randomUUID().toString().replaceAll("-", "") + ".cpp"; //由于没有文件名，这里随机生成一个UUID todo 注册系统上线后，改成 用户名+时间
+        String identity = UUID.randomUUID().toString().replaceAll("-", ""); //由于没有文件名，这里随机生成一个UUID todo 注册系统上线后，改成 用户名+时间
         Vector<String> filenames = new Vector<>();
         try {
+            File directory = new File(savepath + identity);
+            if(!directory.exists()) directory.mkdirs();
             File dst = new File(savepath + identity + "/" + identity + ".cpp");
-            if(!dst.exists()) dst.mkdirs();
+            if(!dst.exists()) dst.createNewFile();
             FileWriter writer = new FileWriter(dst);
             for (String s : code)
                 writer.write(s + "\n");
+            writer.close();
         } catch (IOException e){
             e.printStackTrace();
             return new Message(-1, null, "服务器无法缓存您的代码，请联系管理员。");
