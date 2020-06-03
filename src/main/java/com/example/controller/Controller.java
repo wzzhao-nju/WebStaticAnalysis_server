@@ -1,15 +1,15 @@
 package com.example.controller;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
 
+import com.example.message.FileText;
 import com.example.message.Message;
 import com.example.message.Result;
+import com.example.misc.CheckFile;
 import com.example.misc.CodeLine;
 import com.example.misc.AnalyzeID;
 import net.lingala.zip4j.core.ZipFile;
@@ -125,4 +125,25 @@ public class Controller {
         return results;
     }
 
+    @PostMapping("/api/checkFile")
+    public FileText checkFile(@RequestBody CheckFile checkfile){
+        FileText filetext = new FileText();
+        String identity = checkfile.getAnalyzeID();
+        String filename = checkfile.getFilename();
+        try{
+            File file = new File(savepath + identity + "/" + filename);
+            FileReader in = new FileReader(file);
+            LineNumberReader reader = new LineNumberReader(in);
+            String str;
+            do{
+                str = reader.readLine();
+                filetext.append(str);
+            }while (str != null);
+            reader.close();
+            in.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        return filetext;
+    }
 }
