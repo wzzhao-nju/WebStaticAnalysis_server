@@ -52,7 +52,7 @@ public class Controller {
             e.printStackTrace();
             return new Message(-1, null, "服务器无法缓存您的代码，请联系管理员。");
         }
-        filenames.add(identity);
+        filenames.add(identity + ".cpp");
         identity_filename.put(identity, filenames);
         return new Message(0, identity);
     }
