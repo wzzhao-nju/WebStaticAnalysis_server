@@ -29,7 +29,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 @RestController
 public class Controller {
 
-    private static final String savepath = "/home/WSA/toAnalyze";
+    private static final String savepath = "/home/WSA/toAnalyze/";
     private static final Logger log = LoggerFactory.getLogger(Controller.class); //用于输出信息
     private HashMap<String, Vector<String>> identity_filename = new HashMap<>();
 
