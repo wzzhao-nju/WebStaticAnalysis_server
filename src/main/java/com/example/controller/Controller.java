@@ -134,11 +134,11 @@ public class Controller {
             File file = new File(savepath + identity + "/" + filename);
             FileReader in = new FileReader(file);
             LineNumberReader reader = new LineNumberReader(in);
-            String str;
-            do{
-                str = reader.readLine();
+            String str = reader.readLine();
+            while (str != null){
                 filetext.append(str);
-            }while (str != null);
+                str = reader.readLine();
+            }
             reader.close();
             in.close();
         }catch (IOException e){
