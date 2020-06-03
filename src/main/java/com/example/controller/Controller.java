@@ -113,12 +113,14 @@ public class Controller {
     }
 
     @PostMapping("/api/getResult")
-    public void testResult(@RequestBody Identity identity) {
+    public Vector<Result> testResult(@RequestBody Identity identity) {
         String id = identity.getIdentity();
+        Vector<Result> results= new Vector<>();
         if(identity_filename.containsKey(id)){
-            new Manager().getResult(savepath, id, identity_filename.get(id));
+            results = new Manager().getResult(savepath, id, identity_filename.get(id));
+            identity_filename.remove(id);
         }
-        //new Manager().getResult(filename.getFilename());
+        return results;
     }
 
 }

@@ -1,6 +1,10 @@
 package com.example.controller;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
@@ -27,10 +31,11 @@ public class Manager {
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
     public Vector<Result> getResult(String savepath, String identity, Vector<String> filenames) {
-        //savepath是代码的存储路径，identity是文件夹名称，filenames是所有要检测的文件
+        //savepath是代码的存储路径，identity(id)是文件夹名称(也是AnalyzeId)，filenames是所有要检测的文件
+        //进行系统调用，检测缺陷
         run(savepath, identity, filenames);
-        //转存所有缺陷，与Checker无关
-        ArrayList<Report> reports = readJson(savepath + identity + "/" + identity + ".json");
+        //转存缺陷报告，与Checker无关
+        ArrayList<Report> reports = readJson(savepath + identity + "/" + identity);
         Vector<Defect> defects = new Vector<>();
         for(Report report: reports)
             defects.addAll(report.getDefects());
@@ -117,6 +122,8 @@ public class Manager {
                     break;
                 }
             }
+            if(i == defects.size())
+                disfs.add(disf);
         }while (i < defects.size());
         return disfs;
     }
@@ -192,16 +199,3 @@ public class Manager {
     }
 
 }
-
-//用完就删
-    /*
-    public void testResult(){
-        try {
-            Runtime.getRuntime().exec("../SE-Experiment-master/cmake-build-debug/tools/Checker/Checker " +
-                    "../SE-Experiment-master/tests/IntegrationTest/astList.txt " +
-                    "../SE-Experiment-master/tests/IntegrationTest/config.txt");
-            //Runtime.getRuntime().exec("clang++ -emit-ast -c ../SE-Experiment-master/tests/IntegrationTest/CompareChecker.cpp");
-        }catch (IOException e){
-            e.printStackTrace();
-        }
-    }*/
