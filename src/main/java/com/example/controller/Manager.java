@@ -111,8 +111,8 @@ public class Manager {
             String aLoc = defects.elementAt(i).getLocation();
             String bLoc = defects.elementAt(i+1).getLocation();
             if(aLoc.substring(0, aLoc.lastIndexOf(':')).equals(bLoc.substring(0, bLoc.lastIndexOf(':')))){
-                String info = "第" + aLoc.substring(aLoc.lastIndexOf(':')) + "列: " + defects.elementAt(i).getInfo() + "\n第"
-                        + bLoc.substring(bLoc.lastIndexOf(':')) + "列: " + defects.elementAt(i + 1).getInfo();
+                String info = "第" + aLoc.substring(aLoc.lastIndexOf(':') + 1) + "列: " + defects.elementAt(i).getInfo() + "\n第"
+                        + bLoc.substring(bLoc.lastIndexOf(':') + 1) + "列: " + defects.elementAt(i + 1).getInfo();
                 defects.elementAt(i).setInfo(info);
                 defects.removeElementAt(i + 1);
                 i--;
