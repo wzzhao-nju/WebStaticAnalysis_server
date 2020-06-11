@@ -1,22 +1,31 @@
 package com.example.controller;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.Vector;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.sql.Timestamp;
+import java.util.*;
 
-import com.example.message.FileText;
-import com.example.message.Message;
-import com.example.message.Result;
+import com.example.entity.LoginInfo;
+import com.example.entity.Record;
+import com.example.entity.User;
+import com.example.inter.LoginInfoRepository;
+import com.example.inter.RecordRepository;
+import com.example.inter.UserRepository;
+import com.example.message.*;
 import com.example.misc.CheckFile;
 import com.example.misc.CodeLine;
 import com.example.misc.AnalyzeID;
+import com.example.misc.Login;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.FileHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,20 +33,29 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
+@EnableAsync
 @CrossOrigin(origins = "*")
 @RestController
 public class Controller {
 
     private static final String savepath = "/home/WSA/toAnalyze/";
     private static final Logger log = LoggerFactory.getLogger(Controller.class); //用于输出信息
-    private HashMap<String, Vector<String>> identity_filename = new HashMap<>();
+
+    @Autowired
+    private Manager manager;
+
+    private UserRepository userRepository;
+    private RecordRepository recordRepository;
+    private LoginInfoRepository loginInfoRepository;
 
     //传输代码字符串
     @PostMapping("/api/uploadString")
-    public Message Post(@RequestBody CodeLine codeline){
+    public Message Post(@RequestBody CodeLine codeline, HttpServletRequest request){
         //对字符串进行转存
         String[] code = codeline.getCodeline().split("\n");
-        String identity = UUID.randomUUID().toString().replaceAll("-", ""); //由于没有文件名，这里随机生成一个UUID todo 注册系统上线后，改成 用户名+时间
+        String identity = UUID.randomUUID().toString().replaceAll("-", ""); //由于没有文件名，这里随机生成一个UUID
         Vector<String> filenames = new Vector<>();
         try {
             File directory = new File(savepath + identity);
@@ -53,13 +71,16 @@ public class Controller {
             return new Message(-1, null, "服务器无法缓存您的代码，请联系管理员。");
         }
         filenames.add(identity + ".cpp");
-        identity_filename.put(identity, filenames);
+        //异步调用分析程序进行分析
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        manager.analyze(uid, timestamp, savepath, identity, filenames);
         return new Message(0, identity);
     }
 
-    //传输文件 todo 压缩包
+    //传输文件
     @PostMapping("/api/uploadFile")
-    public Message testFile(@RequestParam(value = "file") MultipartFile upload){
+    public Message uploadFile(@RequestParam(value = "file") MultipartFile upload, HttpServletRequest request){
         String filename = upload.getOriginalFilename();
         String identity = UUID.randomUUID().toString().replaceAll("-", "");
         Vector<String> filenames = new Vector<>();
@@ -98,33 +119,36 @@ public class Controller {
                     if(name.endsWith(".cpp") || name.endsWith(".c"))
                         filenames.add(name);
                 }
-                identity_filename.put(identity, filenames);
                 //删除原压缩包
                 dst.delete();
             }else{
                 filenames.add(filename);
-                identity_filename.put(identity, filenames);
             }
         } catch (IOException | ZipException e){
             log.info(String.format("Logger: restore file %s failed", filename));
             e.printStackTrace();
             return new Message(-1, null, "服务器无法缓存您的文件，请联系管理员。");
         }
-        log.info(String.format("Logger: download %s finished!\n", filename));
+        log.info(String.format("Logger: download %s finished! Starting analyzing!\n", filename));
+        //异步调用分析程序进行分析
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        manager.analyze(uid, timestamp, savepath, identity, filenames);
         return new Message(0, identity);
     }
 
     @PostMapping("/api/getResult")
-    public Vector<Result> testResult(@RequestBody AnalyzeID analyzeID) {
+    public Response testResult(@RequestBody AnalyzeID analyzeID) {
         String id = analyzeID.getAnalyzeID();
-        Vector<Result> results= new Vector<>();
-        if(identity_filename.containsKey(id)){
-            results = new Manager().getResult(savepath, id, identity_filename.get(id));
-            //identity_filename.remove(id);
+        Response response = new Response();
+        if(recordRepository.findById(id).isPresent()) {
+            response.setStatusCode(0);
+            response.setResults(manager.readJsonFinal(savepath + id + "/" + id + "FinalResult"));
         }
-        return results;
+        return response;
     }
 
+    //查看完整文件
     @PostMapping("/api/checkFile")
     public FileText checkFile(@RequestBody CheckFile checkfile){
         FileText filetext = new FileText();
@@ -145,5 +169,86 @@ public class Controller {
             e.printStackTrace();
         }
         return filetext;
+    }
+
+    //查看历史记录
+    @PostMapping("/api/checkHistory")
+    public void checkHistory(HttpServletRequest request){
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+        //ArrayList<Record> records = new ArrayList<>();
+        //ecords = recordRepository.findByUid(uid);
+        //return records;
+    }
+
+    @PostMapping("/api/register")
+    public RegisterLoginInfo register(@RequestBody Login login, HttpServletRequest request){
+        String username = login.getUsername();
+        if(username.length() <= 4)
+            return new RegisterLoginInfo(-1, "用户名不得小于4个字符");
+        String password = login.getPassword();
+        if(password.length() <= 6)
+            return new RegisterLoginInfo(-1, "密码不得少于6位");
+        List<User> users = userRepository.findByName(username);
+        if(users.size() >= 1){
+            return new RegisterLoginInfo(-1, "用户名已被使用，请更换一个用户名");
+        }else {
+            User user = new User();
+            user.setName(username);
+            user.setPassword(password);
+            userRepository.save(user);
+            //注册成功后自动登录
+            request.getSession().setAttribute("uid", user.getUid());
+            LoginInfo loginInfo = new LoginInfo();
+            loginInfo.setSessionId(request.getSession().getId());
+            loginInfo.setUid(user.getUid());
+            loginInfoRepository.save(loginInfo);
+            return new RegisterLoginInfo(0, "注册成功");
+        }
+    }
+
+    @PostMapping("/api/login")
+    public RegisterLoginInfo login(@RequestBody Login login, HttpServletRequest request){
+        String username = login.getUsername();
+        List<User> users = userRepository.findByName(username);
+        if(users.size() == 0){
+            return new RegisterLoginInfo(-1, "用户名不存在");
+        }else if(users.size() > 1){
+            return new RegisterLoginInfo(-1, "用户名有误，请联系管理员");
+        }else{
+            User user = users.get(0);
+            String password = login.getPassword();
+            if(loginInfoRepository.findByUid(user.getUid()).size() > 0)
+                return new RegisterLoginInfo(-1, "该用户已登录");
+            if(user.getPassword().equals(password)) {
+                //设置session, 将登录状态存储到数据库中
+                request.getSession().setAttribute("uid", user.getUid());
+                LoginInfo loginInfo = new LoginInfo();
+                loginInfo.setSessionId(request.getSession().getId());
+                loginInfo.setUid(userRepository.findByName(username).get(0).getUid());
+                loginInfoRepository.save(loginInfo);
+                return new RegisterLoginInfo(0, "登录成功");
+            }
+            else
+                return new RegisterLoginInfo(-1, "密码输入错误");
+        }
+    }
+
+    @PostMapping("/api/loginAsGuest")
+    public RegisterLoginInfo loginAsGuest(HttpServletRequest request){
+        request.getSession().setAttribute("uid", -1);
+        LoginInfo loginInfo = new LoginInfo();
+        loginInfo.setSessionId(request.getSession().getId());
+        loginInfo.setUid(-1);
+        loginInfoRepository.save(loginInfo);
+        return new RegisterLoginInfo(0, "登录成功");
+    }
+
+    @PostMapping("/api/logoff")
+    public RegisterLoginInfo logoff(HttpServletRequest request){
+        String sessionId = request.getSession().getId();
+        Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
+        loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
+        request.getSession().invalidate();
+        return new RegisterLoginInfo(0, "注销成功");
     }
 }

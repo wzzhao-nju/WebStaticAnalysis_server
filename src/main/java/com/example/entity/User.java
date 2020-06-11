@@ -8,20 +8,21 @@ import javax.persistence.Id;
 //数据库中对应的table名为user
 @Entity // This tells Hibernate to make a table out of this class
 public class User {
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer uid;
 
     private String name;
 
     private String password;
 
-    public Integer getId() {
-        return id;
+    public Integer getUid() {
+        return uid;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public String getName() {

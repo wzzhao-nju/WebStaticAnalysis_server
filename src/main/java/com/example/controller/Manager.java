@@ -5,10 +5,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
+import com.example.entity.Record;
+import com.example.inter.RecordRepository;
 import com.example.json.Defect;
 import com.example.json.DefectIntheSameFile;
 import com.example.json.Report;
@@ -17,6 +20,7 @@ import com.example.message.Error;
 import com.example.message.Line;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.scheduling.annotation.Async;
 
 //该类主要实现对缺陷检测程序的调用，读取结果后，生成json报文返回给Controller，再由Controller返回给前端
 public class Manager {
@@ -30,7 +34,10 @@ public class Manager {
             "\tdivideChecker = false", "\tmemoryOPChecker = false", "}", "Framework", "{",
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
-    public Vector<Result> getResult(String savepath, String identity, Vector<String> filenames) {
+    private RecordRepository recordRepository;
+
+    @Async
+    public void analyze(Integer uid, Timestamp timestamp, String savepath, String identity, Vector<String> filenames) {
         //savepath是代码的存储路径，identity(id)是文件夹名称(也是AnalyzeId)，filenames是所有要检测的文件
         //进行系统调用，检测缺陷
         run(savepath, identity, filenames);
@@ -52,7 +59,20 @@ public class Manager {
             result.setFilename(disf.getFilename());
             results.add(result);
         }
-        return results;
+        //将结果写入文件存储起来
+        writeJson(savepath + identity + "/" + identity + "FinalResult", results);
+        //统计缺陷数量
+        int errorCount = 0;
+        for(Result result: results)
+            errorCount += result.getError_count();
+        //分析完成后，将分析结果保存到数据库中
+        Record record = new Record();
+        record.setUid(uid);
+        record.setAnalyzeId(identity);
+        record.setTimestamp(timestamp);
+        record.setFilecount(results.size());
+        record.setErrorcount(errorCount);
+        recordRepository.save(record);
     }
 
     //系统调用
@@ -103,6 +123,30 @@ public class Manager {
             e.printStackTrace();
         }
         return reports;
+    }
+
+    public Vector<Result> readJsonFinal(String jsonFilename){
+        ObjectMapper mapper = new ObjectMapper();
+        File jsonFile = new File(jsonFilename + ".json");
+        Vector<Result> results = new Vector<>();
+        try {
+            JavaType type = mapper.getTypeFactory().constructCollectionType(Vector.class, Result.class);
+            results = mapper.readValue(jsonFile, type);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        return results;
+    }
+
+    //将检测结果存入json文件
+    public void writeJson(String jsonFilename, Vector<Result> results){
+        ObjectMapper mapper = new ObjectMapper();
+        File jsonFile = new File(jsonFilename + ".json");
+        try {
+            mapper.writeValue(jsonFile, results);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //去重并合并缺陷信息

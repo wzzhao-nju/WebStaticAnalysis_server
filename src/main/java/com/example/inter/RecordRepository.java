@@ -1,10 +1,10 @@
 package com.example.inter;
 
-import com.example.entity.RecordCompositeKeys;
+import com.example.entity.Record;
 import org.springframework.data.repository.CrudRepository;
 
-import com.example.entity.Record;
+import java.util.List;
 
-public interface RecordRepository extends CrudRepository<Record, RecordCompositeKeys>{
-    
+public interface RecordRepository extends CrudRepository<Record, String> {
+    List<Record> findByUid(Integer uid);
 }

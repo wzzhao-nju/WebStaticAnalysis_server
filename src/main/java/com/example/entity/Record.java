@@ -1,34 +1,37 @@
 package com.example.entity;
 
-import com.example.message.Result;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.sql.Timestamp;
 
-//每次缺陷检测的记录
 @Entity
-@IdClass(RecordCompositeKeys.class)
 public class Record {
-    @Id
-    private Integer uid; //用户id
-    private Result result; //缺陷检测结果
-    @Id
-    private Timestamp timestamp; //缺陷检测的时间戳
 
-    public void setId(Integer uid) {
+    @Id
+    private String analyzeId;
+
+    private Integer uid;
+
+    private Timestamp timestamp;
+
+    private Integer filecount;
+
+    private Integer errorcount;
+
+    public void setAnalyzeId(String analyzeId) {
+        this.analyzeId = analyzeId;
+    }
+
+    public String getAnalyzeId() {
+        return analyzeId;
+    }
+
+    public void setUid(Integer uid) {
         this.uid = uid;
     }
 
     public Integer getUid() {
         return uid;
-    }
-
-    public void setResult(Result result) {
-        this.result = result;
-    }
-
-    public Result getResult() {
-        return result;
     }
 
     public void setTimestamp(Timestamp timestamp) {
@@ -37,5 +40,21 @@ public class Record {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public void setFilecount(Integer filecount) {
+        this.filecount = filecount;
+    }
+
+    public Integer getFilecount() {
+        return filecount;
+    }
+
+    public void setErrorcount(Integer errorcount) {
+        this.errorcount = errorcount;
+    }
+
+    public Integer getErrorcount() {
+        return errorcount;
     }
 }
