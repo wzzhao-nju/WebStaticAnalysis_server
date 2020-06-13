@@ -45,9 +45,11 @@ public class Controller {
 
     @Autowired
     private Manager manager;
-
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private RecordRepository recordRepository;
+    @Autowired
     private LoginInfoRepository loginInfoRepository;
 
     //传输代码字符串
@@ -138,7 +140,7 @@ public class Controller {
     }
 
     @PostMapping("/api/getResult")
-    public Response testResult(@RequestBody AnalyzeID analyzeID) {
+    public Response getResult(@RequestBody AnalyzeID analyzeID) {
         String id = analyzeID.getAnalyzeID();
         Response response = new Response();
         if(recordRepository.findById(id).isPresent()) {
@@ -173,11 +175,14 @@ public class Controller {
 
     //查看历史记录
     @PostMapping("/api/checkHistory")
-    public void checkHistory(HttpServletRequest request){
+    public Vector<History> checkHistory(HttpServletRequest request){
         Integer uid = (Integer) request.getSession().getAttribute("uid");
-        //ArrayList<Record> records = new ArrayList<>();
-        //ecords = recordRepository.findByUid(uid);
-        //return records;
+        List<Record> records = recordRepository.findByUid(uid);
+        Vector<History> histories = new Vector<>();
+        for(Record record: records)
+            histories.add(new History(record.getAnalyzeId(), record.getTimestamp(),
+                    record.getFilecount(), record.getErrorcount()));
+        return histories;
     }
 
     @PostMapping("/api/register")
@@ -188,10 +193,7 @@ public class Controller {
         String password = login.getPassword();
         if(password.length() <= 6)
             return new RegisterLoginInfo(-1, "密码不得少于6位");
-        List<User> users = userRepository.findByName(username);
-        if(users.size() >= 1){
-            return new RegisterLoginInfo(-1, "用户名已被使用，请更换一个用户名");
-        }else {
+        if(!userRepository.existsByName(username)){
             User user = new User();
             user.setName(username);
             user.setPassword(password);
@@ -203,6 +205,8 @@ public class Controller {
             loginInfo.setUid(user.getUid());
             loginInfoRepository.save(loginInfo);
             return new RegisterLoginInfo(0, "注册成功");
+        }else {
+            return new RegisterLoginInfo(-1, "用户名已被使用，请更换一个用户名");
         }
     }
 

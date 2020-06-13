@@ -21,8 +21,10 @@ import com.example.message.Line;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 //该类主要实现对缺陷检测程序的调用，读取结果后，生成json报文返回给Controller，再由Controller返回给前端
+@Component
 public class Manager {
     private final String astlistFilename = "astList.txt";
     private final String configFilename = "config.txt";
@@ -36,7 +38,7 @@ public class Manager {
 
     private RecordRepository recordRepository;
 
-    @Async
+    @Async("taskExecutor")
     public void analyze(Integer uid, Timestamp timestamp, String savepath, String identity, Vector<String> filenames) {
         //savepath是代码的存储路径，identity(id)是文件夹名称(也是AnalyzeId)，filenames是所有要检测的文件
         //进行系统调用，检测缺陷
