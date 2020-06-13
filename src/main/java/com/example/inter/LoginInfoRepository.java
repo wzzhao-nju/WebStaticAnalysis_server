@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface LoginInfoRepository extends CrudRepository<LoginInfo, String> {
     List<LoginInfo> findByUid(Integer uid);
+    boolean existsByUid(Integer uid);
 }

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @EnableAsync
 @CrossOrigin(origins = "*")
@@ -188,12 +189,14 @@ public class Controller {
     @PostMapping("/api/register")
     public RegisterLoginInfo register(@RequestBody Login login, HttpServletRequest request){
         String username = login.getUsername();
-        if(username.length() <= 4)
+        if(username.length() < 4)
             return new RegisterLoginInfo(-1, "用户名不得小于4个字符");
         String password = login.getPassword();
-        if(password.length() <= 6)
+        if(password.length() < 6)
             return new RegisterLoginInfo(-1, "密码不得少于6位");
-        if(!userRepository.existsByName(username)){
+        if(userRepository.existsByName(username)){
+            return new RegisterLoginInfo(-1, "用户名已被使用，请更换一个用户名");
+        }else {
             User user = new User();
             user.setName(username);
             user.setPassword(password);
@@ -205,8 +208,6 @@ public class Controller {
             loginInfo.setUid(user.getUid());
             loginInfoRepository.save(loginInfo);
             return new RegisterLoginInfo(0, "注册成功");
-        }else {
-            return new RegisterLoginInfo(-1, "用户名已被使用，请更换一个用户名");
         }
     }
 
@@ -214,16 +215,16 @@ public class Controller {
     public RegisterLoginInfo login(@RequestBody Login login, HttpServletRequest request){
         String username = login.getUsername();
         List<User> users = userRepository.findByName(username);
-        if(users.size() == 0){
+        if(users.size() != 1){
             return new RegisterLoginInfo(-1, "用户名不存在");
-        }else if(users.size() > 1){
-            return new RegisterLoginInfo(-1, "用户名有误，请联系管理员");
         }else{
             User user = users.get(0);
             String password = login.getPassword();
-            if(loginInfoRepository.findByUid(user.getUid()).size() > 0)
-                return new RegisterLoginInfo(-1, "该用户已登录");
             if(user.getPassword().equals(password)) {
+                //如果重复登录, 顶掉前一个人
+                List<LoginInfo> infos = loginInfoRepository.findByUid(user.getUid());
+                if(infos.size() > 0)
+                    loginInfoRepository.delete(infos.get(0));
                 //设置session, 将登录状态存储到数据库中
                 request.getSession().setAttribute("uid", user.getUid());
                 LoginInfo loginInfo = new LoginInfo();
@@ -240,10 +241,12 @@ public class Controller {
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request){
         request.getSession().setAttribute("uid", -1);
+        /*
         LoginInfo loginInfo = new LoginInfo();
         loginInfo.setSessionId(request.getSession().getId());
         loginInfo.setUid(-1);
         loginInfoRepository.save(loginInfo);
+        */
         return new RegisterLoginInfo(0, "登录成功");
     }
 
@@ -252,7 +255,17 @@ public class Controller {
         String sessionId = request.getSession().getId();
         Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
+        request.getSession().removeAttribute("uid");
         request.getSession().invalidate();
         return new RegisterLoginInfo(0, "注销成功");
     }
+/*
+    @PostMapping("/api/test")
+    public Map<Integer, String> test(HttpServletRequest request){
+        String sessionId = request.getSession().getId();
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+        Map<Integer, String> map = new HashMap<>();
+        map.put(uid, sessionId);
+        return map;
+    }*/
 }
