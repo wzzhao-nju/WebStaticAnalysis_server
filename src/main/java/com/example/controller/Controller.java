@@ -259,7 +259,7 @@ public class Controller {
         request.getSession().invalidate();
         return new RegisterLoginInfo(0, "注销成功");
     }
-/*
+
     @PostMapping("/api/test")
     public Map<Integer, String> test(HttpServletRequest request){
         String sessionId = request.getSession().getId();
@@ -267,5 +267,5 @@ public class Controller {
         Map<Integer, String> map = new HashMap<>();
         map.put(uid, sessionId);
         return map;
-    }*/
+    }
 }
