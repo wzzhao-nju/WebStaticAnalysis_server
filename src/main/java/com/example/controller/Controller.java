@@ -33,7 +33,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @EnableAsync
@@ -267,5 +269,12 @@ public class Controller {
         Map<Integer, String> map = new HashMap<>();
         map.put(uid, sessionId);
         return map;
+    }
+
+    @PostMapping("setcookie")
+    public String setcookie(HttpServletResponse response){
+        Cookie cookie = new Cookie("111", "222");
+        response.addCookie(cookie);
+        return "OK";
     }
 }
