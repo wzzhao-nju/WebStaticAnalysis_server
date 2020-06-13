@@ -26,11 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.Cookie;
@@ -271,10 +267,10 @@ public class Controller {
         return map;
     }
 
-    @PostMapping("setcookie")
+    @GetMapping("setcookie")
     public String setcookie(HttpServletResponse response){
         Cookie cookie = new Cookie("111", "222");
-        cookie.setDomain("");
+        cookie.setDomain("http://118.89.104.33:8888");
         response.addCookie(cookie);
         return "OK";
     }
