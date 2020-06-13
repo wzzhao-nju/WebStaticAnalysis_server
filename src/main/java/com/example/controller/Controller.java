@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @EnableAsync
-@CrossOrigin(origins = "118.89.104.33")
+@CrossOrigin(origins = "118.89.104.33", allowCredentials = "true")
 @RestController
 public class Controller {
 
