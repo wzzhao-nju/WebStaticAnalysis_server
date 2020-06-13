@@ -267,7 +267,7 @@ public class Controller {
         return map;
     }
 
-    @GetMapping("setcookie")
+    @PostMapping("setcookie")
     public String setcookie(HttpServletResponse response){
         Cookie cookie = new Cookie("111", "222");
         cookie.setDomain("http://118.89.104.33:8888");
