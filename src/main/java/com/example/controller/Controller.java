@@ -146,7 +146,7 @@ public class Controller {
     public Response getResult(@RequestBody AnalyzeID analyzeID) {
         String id = analyzeID.getAnalyzeID();
         Response response = new Response();
-        if(recordRepository.findById(id).isPresent()) {
+        if(recordRepository.existsById(id)) {
             response.setStatusCode(0);
             response.setResults(manager.readJsonFinal(savepath + id + "/" + id + "FinalResult"));
         }
@@ -274,6 +274,7 @@ public class Controller {
     @PostMapping("setcookie")
     public String setcookie(HttpServletResponse response){
         Cookie cookie = new Cookie("111", "222");
+        cookie.setDomain("");
         response.addCookie(cookie);
         return "OK";
     }
