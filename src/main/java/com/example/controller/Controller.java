@@ -220,11 +220,13 @@ public class Controller {
             User user = users.get(0);
             String password = login.getPassword();
             if(user.getPassword().equals(password)) {
+                System.out.print("uid="+user.getUid()+"\n");
                 //如果重复登录, 顶掉前一个人
                 List<LoginInfo> infos = loginInfoRepository.findByUid(user.getUid());
                 if(infos.size() > 0)
                     loginInfoRepository.delete(infos.get(0));
                 //设置session, 将登录状态存储到数据库中
+                System.out.print(request.getSession().getId()+"\n");
                 request.getSession().setAttribute("uid", user.getUid());
                 LoginInfo loginInfo = new LoginInfo();
                 loginInfo.setSessionId(request.getSession().getId());
