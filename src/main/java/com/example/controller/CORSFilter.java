@@ -13,7 +13,7 @@ import java.io.IOException;
 
 //
 //@WebFilter(filterName = "CORSFilter", urlPatterns = "/*)
-@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "*")
 public class CORSFilter implements Filter {
     @Override
     public void destroy() {
