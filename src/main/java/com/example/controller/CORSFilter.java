@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-//@CrossOrigin(origins = "*", allowCredentials = "true")
-@WebFilter(filterName = "CORSFilter", urlPatterns = "/*")
+//
+//@WebFilter(filterName = "CORSFilter", urlPatterns = "/*)
+@CrossOrigin(origins = "*")
 public class CORSFilter implements Filter {
     @Override
     public void destroy() {
@@ -42,7 +43,5 @@ public class CORSFilter implements Filter {
         resp.setHeader("Access-Control-Allow-Credentials", "true");//true代表允许携带cookie
         chain.doFilter(servletRequest,servletResponse);
     }
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+
 }
