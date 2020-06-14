@@ -246,7 +246,7 @@ public class Controller {
     public RegisterLoginInfo test(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
         System.out.print("/api/test\n");
         System.out.print("/api/test id:" + request.getSession().getId()+"\n");
-        if(request.getSession().getAttribute("test")==null)
+        if(request.getSession().getAttribute("uid")==null)
             System.out.print("not attribute!\n");
         else
             System.out.print("has attribute\n");
