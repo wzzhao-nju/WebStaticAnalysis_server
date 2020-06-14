@@ -228,7 +228,9 @@ public class Controller {
                         loginInfoRepository.delete(info);
                 //设置session, 将登录状态存储到数据库中
                 System.out.print(request.getSession().getId()+"\n");
+                System.out.print("att1:"+request.getSession().getAttribute("uid"));
                 request.getSession().setAttribute("uid", user.getUid());
+                System.out.print("att2:"+request.getSession().getAttribute("uid"));
                 LoginInfo loginInfo = new LoginInfo();
                 loginInfo.setSessionId(request.getSession().getId());
                 loginInfo.setUid(userRepository.findByName(username).get(0).getUid());
@@ -255,6 +257,7 @@ public class Controller {
 
     @PostMapping("/api/logoff")
     public RegisterLoginInfo logoff(HttpServletRequest request){
+        System.out.print("att:"+request.getSession().getAttribute("uid"));
         String sessionId = request.getSession().getId();
         Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
