@@ -281,4 +281,15 @@ public class Controller {
         return new Message(-1, null, "try to set cookie");
     }
 
+    public void setCookie(HttpServletRequest request, HttpServletResponse response){
+        String sessionId = request.getSession().getId();
+        Cookie cookie = new Cookie("JSESSIONID", sessionId);
+        cookie.setDomain("118.89.104.33");
+        cookie.setPath("/");
+        response.addCookie(cookie);
+        response.setHeader("Access-Control-Expose-Headers","MyCookie");
+        response.setHeader("Access-Control-Allow-Headers","MyCookie");
+        response.setHeader("MyCookie", "JSESSIONID="+sessionId);
+    }
+
 }
