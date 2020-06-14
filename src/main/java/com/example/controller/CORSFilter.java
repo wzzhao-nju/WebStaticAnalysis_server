@@ -2,6 +2,7 @@ package com.example.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
@@ -40,6 +41,11 @@ public class CORSFilter implements Filter {
         resp.setHeader("Access-Control-Allow-Origin", origin);//这里不能写*，*代表接受所有域名访问，如写*则下面一行代码无效。谨记
         resp.setHeader("Access-Control-Allow-Credentials", "true");//true代表允许携带cookie
         resp.setHeader("Access-Control-Allow-Headers", "content-type");
+
+        if (req.getMethod().equals("OPTIONS")) {
+            resp.setStatus(HttpStatus.OK.value());
+            return;
+        }
 
         chain.doFilter(servletRequest,servletResponse);
     }
