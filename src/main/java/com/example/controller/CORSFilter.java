@@ -1,5 +1,8 @@
 package com.example.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 import javax.servlet.*;
@@ -8,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebFilter(urlPatterns = "/*", filterName = "CORSFilter")
-@CrossOrigin(origins = "*", allowCredentials = "true")
+//@CrossOrigin(origins = "*", allowCredentials = "true")
+@WebFilter(filterName = "CORSFilter", urlPatterns = "/*")
 public class CORSFilter implements Filter {
     @Override
     public void destroy() {
@@ -24,7 +27,9 @@ public class CORSFilter implements Filter {
      */
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws ServletException, IOException {
-        System.out.print("fileter\n");
+        Logger log = LoggerFactory.getLogger(CORSFilter.class);
+        log.info("filter\n");
+        System.out.print("filter\n");
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         String origin = req.getHeader("Origin");
