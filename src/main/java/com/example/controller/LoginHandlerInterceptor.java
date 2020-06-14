@@ -27,6 +27,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         response.setCharacterEncoding("UTF-8");
         try {
             if(uid == null) {
+                System.out.print("uid is null\n");
                 response.setStatus(430);
                 response.getWriter().append("请先登录");
                 return false;
@@ -37,6 +38,8 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             if(loginInfoList.size() <= 0 || loginInfoList.get(0).getSessionId().equals(request.getSession().getId()))
                 return true;
             else{
+                System.out.print("sessionId:"+request.getSession().getId()+"\n");
+                System.out.print("database:" + loginInfoList.get(0).getSessionId() + "\n");
                 response.setStatus(430);
                 response.getWriter().append("登录已过期, 或者已在其他地方登录");
                 return false;

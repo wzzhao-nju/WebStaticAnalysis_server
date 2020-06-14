@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import sun.rmi.runtime.Log;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -221,10 +222,11 @@ public class Controller {
             String password = login.getPassword();
             if(user.getPassword().equals(password)) {
                 System.out.print("uid="+user.getUid()+"\n");
-                //如果重复登录, 顶掉前一个人
+                //如果重复登录, 顶掉前面的人
                 List<LoginInfo> infos = loginInfoRepository.findByUid(user.getUid());
                 if(infos.size() > 0)
-                    loginInfoRepository.delete(infos.get(0));
+                    for(LoginInfo info: infos)
+                        loginInfoRepository.delete(info);
                 //设置session, 将登录状态存储到数据库中
                 System.out.print(request.getSession().getId()+"\n");
                 request.getSession().setAttribute("uid", user.getUid());
