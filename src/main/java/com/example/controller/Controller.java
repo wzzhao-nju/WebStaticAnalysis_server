@@ -227,7 +227,7 @@ public class Controller {
                     loginInfoRepository.delete(infos.get(0));
                 //设置session, 将登录状态存储到数据库中
                 System.out.print(request.getSession().getId()+"\n");
-                //request.getSession().setAttribute("uid", user.getUid());
+                request.getSession().setAttribute("uid", user.getUid());
                 LoginInfo loginInfo = new LoginInfo();
                 loginInfo.setSessionId(request.getSession().getId());
                 loginInfo.setUid(userRepository.findByName(username).get(0).getUid());
