@@ -20,6 +20,7 @@ import com.example.message.Error;
 import com.example.message.Line;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,7 @@ public class Manager {
             "\tdivideChecker = false", "\tmemoryOPChecker = false", "}", "Framework", "{",
             "\tqueue_size = 100", "}", "TemplateChecker", "{", "\trequest_fun = 2", "}"};
 
+    @Autowired
     private RecordRepository recordRepository;
 
     @Async("taskExecutor")

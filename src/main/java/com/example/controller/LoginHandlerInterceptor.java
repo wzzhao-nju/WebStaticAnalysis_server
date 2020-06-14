@@ -23,7 +23,8 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-        Object uid = request.getSession().getAttribute("uid");
+        System.out.print("111:" + request.getSession().getId() + "\n");
+        Integer uid = (Integer)request.getSession().getAttribute("uid");
         response.setCharacterEncoding("UTF-8");
         try {
             if(uid == null) {
@@ -32,9 +33,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                 response.getWriter().append("请先登录");
                 return false;
             }
-            if((Integer)uid == -1)
+            if(uid == -1)
                 return true;
-            List<LoginInfo> loginInfoList = loginInfoRepository.findByUid((Integer) uid);
+            List<LoginInfo> loginInfoList = loginInfoRepository.findByUid(uid);
             if(loginInfoList.size() <= 0 || loginInfoList.get(0).getSessionId().equals(request.getSession().getId()))
                 return true;
             else{

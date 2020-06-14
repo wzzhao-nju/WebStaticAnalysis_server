@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import sun.rmi.runtime.Log;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -244,7 +243,7 @@ public class Controller {
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
-        setCookie(request, response);
+        //setCookie(request, response);
         /*
         LoginInfo loginInfo = new LoginInfo();
         loginInfo.setSessionId(request.getSession().getId());
