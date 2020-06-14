@@ -185,7 +185,7 @@ public class Controller {
     }
 
     @PostMapping("/api/register")
-    public RegisterLoginInfo register(@RequestBody Login login, HttpServletRequest request){
+    public RegisterLoginInfo register(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
         String username = login.getUsername();
         if(username.length() < 4)
             return new RegisterLoginInfo(-1, "用户名不得小于4个字符");
@@ -201,6 +201,7 @@ public class Controller {
             userRepository.save(user);
             //注册成功后自动登录
             request.getSession().setAttribute("uid", user.getUid());
+            setCookie(request, response);
             LoginInfo loginInfo = new LoginInfo();
             loginInfo.setSessionId(request.getSession().getId());
             loginInfo.setUid(user.getUid());
@@ -210,7 +211,7 @@ public class Controller {
     }
 
     @PostMapping("/api/login")
-    public RegisterLoginInfo login(@RequestBody Login login, HttpServletRequest request){
+    public RegisterLoginInfo login(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
         String username = login.getUsername();
         List<User> users = userRepository.findByName(username);
         if(users.size() != 1){
@@ -237,8 +238,9 @@ public class Controller {
     }
 
     @PostMapping("/api/loginAsGuest")
-    public RegisterLoginInfo loginAsGuest(HttpServletRequest request){
+    public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
+        setCookie(request, response);
         /*
         LoginInfo loginInfo = new LoginInfo();
         loginInfo.setSessionId(request.getSession().getId());
@@ -258,20 +260,11 @@ public class Controller {
         return new RegisterLoginInfo(0, "注销成功");
     }
 
-    @PostMapping("/api/test")
-    public Map<Integer, String> test(HttpServletRequest request){
-        String sessionId = request.getSession().getId();
-        Integer uid = (Integer) request.getSession().getAttribute("uid");
-        Map<Integer, String> map = new HashMap<>();
-        map.put(uid, sessionId);
-        return map;
-    }
-
     @PostMapping("setcookie")
-     public Message setcookie(HttpServletResponse response){
+     public Message cookie(HttpServletResponse response){
         System.out.print("method!\n");
         Cookie cookie = new Cookie("111", "222");
-        cookie.setDomain("118.89.104.33");
+        //cookie.setDomain("");
         //response.setHeader("Access-Control-Expose-Headers","Set-Cookie");
         //response.setHeader("Access-Control-Allow-Headers","Set-Cookie");
         response.addCookie(cookie);
