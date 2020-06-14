@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @EnableAsync
-@CrossOrigin(origins = "*", allowCredentials = "true")
+//@CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
 public class Controller {
 

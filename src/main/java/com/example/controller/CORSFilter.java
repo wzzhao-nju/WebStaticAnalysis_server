@@ -1,11 +1,15 @@
 package com.example.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 @WebFilter(urlPatterns = "/*", filterName = "CORSFilter")
+@CrossOrigin(origins = "*", allowCredentials = "true")
 public class CORSFilter implements Filter {
     @Override
     public void destroy() {
