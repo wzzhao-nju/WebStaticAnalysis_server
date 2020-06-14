@@ -250,6 +250,8 @@ public class Controller {
             System.out.print("not attribute!\n");
         else
             System.out.print("has attribute\n");
+        if(request.getSession().getAttribute("test")!=null)
+            System.out.print("has test\n");
         request.getSession().setAttribute("test", "test");
         System.out.print("setAttribute done!\n");
         return new RegisterLoginInfo(0, "这是一个测试");
