@@ -242,6 +242,19 @@ public class Controller {
         }
     }
 
+    @PostMapping("/api/test")
+    public RegisterLoginInfo test(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
+        System.out.print("/api/test\n");
+        System.out.print("/api/test id:" + request.getSession().getId()+"\n");
+        if(request.getSession().getAttribute("test")==null)
+            System.out.print("not attribute!\n");
+        else
+            System.out.print("has attribute\n");
+        request.getSession().setAttribute("test", "test");
+        System.out.print("setAttribute done!\n");
+        return new RegisterLoginInfo(0, "这是一个测试");
+    }
+
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
