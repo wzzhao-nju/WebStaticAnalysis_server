@@ -227,9 +227,11 @@ public class Controller {
             if(user.getPassword().equals(password)) {
                 //如果重复登录, 顶掉前面的人
                 List<LoginInfo> infos = loginInfoRepository.findByUid(user.getUid());
-                if(infos.size() > 0)
-                    for(LoginInfo info: infos)
+                if(infos.size() > 0) {
+                    for (LoginInfo info : infos)
                         loginInfoRepository.delete(info);
+                    log.info(String.format("Repeated login(uid = %d), kicked others before", user.getUid()));
+                }
 
                 //设置session, 将登录状态存储到数据库中
                 request.getSession().setAttribute("uid", user.getUid());
