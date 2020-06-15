@@ -32,10 +32,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @EnableAsync
-//@CrossOrigin(origins = "*", allowCredentials = "true")
 @RestController
 public class Controller {
 
@@ -279,20 +277,6 @@ public class Controller {
         request.getSession().removeAttribute("uid");
         request.getSession().invalidate();
         return new RegisterLoginInfo(0, "注销成功");
-    }
-
-    @PostMapping("setcookie")
-     public Message cookie(HttpServletResponse response){
-        System.out.print("method!\n");
-        Cookie cookie = new Cookie("111", "222");
-        //cookie.setDomain("");
-        //response.setHeader("Access-Control-Expose-Headers","Set-Cookie");
-        //response.setHeader("Access-Control-Allow-Headers","Set-Cookie");
-        response.addCookie(cookie);
-        response.setHeader("Access-Control-Expose-Headers","MyCookie");
-        response.setHeader("Access-Control-Allow-Headers","MyCookie");
-        response.setHeader("MyCookie","111=222");
-        return new Message(-1, null, "try to set cookie");
     }
 
     public void setCookie(HttpServletRequest request, HttpServletResponse response){

@@ -19,4 +19,12 @@ public class Response {
     public void setResults(Vector<Result> results) {
         this.results = results;
     }
+
+    public int getStatusCode() {
+        return statusCode;
+    }
+
+    public Vector<Result> getResults() {
+        return results;
+    }
 }
