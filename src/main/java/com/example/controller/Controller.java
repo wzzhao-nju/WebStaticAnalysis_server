@@ -177,7 +177,7 @@ public class Controller {
 
     //查看历史记录
     @PostMapping("/api/checkHistory")
-    public Vector<History> checkHistory(HttpServletRequest request){
+    public HistoryResponse checkHistory(HttpServletRequest request){
         Integer uid = (Integer) request.getSession().getAttribute("uid");
         log.info(String.format("Checking record from uid = %d", uid));
 
@@ -186,7 +186,15 @@ public class Controller {
         for(Record record: records)
             histories.add(new History(record.getAnalyzeId(), record.getTimestamp(),
                     record.getFilecount(), record.getErrorcount()));
-        return histories;
+
+        //生成返回结构体
+        HistoryResponse historyResponse = new HistoryResponse();
+        if(uid == -1) {
+            historyResponse.setStatusCode(-1);
+            return historyResponse;
+        }
+        historyResponse.setHistories(histories);
+        return historyResponse;
     }
 
     //注册, 注册成功后会自动登录
