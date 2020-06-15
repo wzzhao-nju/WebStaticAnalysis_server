@@ -5,6 +5,8 @@ public class Line {
     private int lineNo; //行号
     private String code; //代码
 
+    public Line(){}
+
     public Line(int lineNo, String code) {
         this.lineNo = lineNo;
         this.code = code;
