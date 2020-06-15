@@ -41,7 +41,7 @@ public class Manager {
     private RecordRepository recordRepository;
 
     @Async("taskExecutor")
-    public void analyze(Integer uid, Timestamp timestamp, String savepath, String identity, Vector<String> filenames) {
+    public void analyze(Integer uid, Timestamp timestamp, String name, String savepath, String identity, Vector<String> filenames) {
         //savepath是代码的存储路径，identity(id)是文件夹名称(也是AnalyzeId)，filenames是所有要检测的文件
         //进行系统调用，检测缺陷
         run(savepath, identity, filenames);
@@ -74,6 +74,7 @@ public class Manager {
         record.setUid(uid);
         record.setAnalyzeId(identity);
         record.setTimestamp(timestamp);
+        record.setFilename(name);
         record.setFilecount(results.size());
         record.setErrorcount(errorCount);
         recordRepository.save(record);

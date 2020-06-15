@@ -19,6 +19,8 @@ public class Record {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp timestamp;
 
+    private String filename;
+
     private Integer filecount;
 
     private Integer errorcount;
@@ -45,6 +47,14 @@ public class Record {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     public void setFilecount(Integer filecount) {

@@ -75,7 +75,7 @@ public class Controller {
         //异步调用分析程序进行分析
         Integer uid = (Integer) request.getSession().getAttribute("uid");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        manager.analyze(uid, timestamp, savepath, identity, filenames);
+        manager.analyze(uid, timestamp, "source_code", savepath, identity, filenames);
         return new Message(0, identity);
     }
 
@@ -134,7 +134,7 @@ public class Controller {
         //异步调用分析程序进行分析
         Integer uid = (Integer) request.getSession().getAttribute("uid");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        manager.analyze(uid, timestamp, savepath, identity, filenames);
+        manager.analyze(uid, timestamp, filename, savepath, identity, filenames);
         return new Message(0, identity);
     }
 
@@ -185,7 +185,7 @@ public class Controller {
         Vector<History> histories = new Vector<>();
         for(Record record: records)
             histories.add(new History(record.getAnalyzeId(), record.getTimestamp(),
-                    record.getFilecount(), record.getErrorcount()));
+                    record.getFilename(), record.getFilecount(), record.getErrorcount()));
 
         //生成返回结构体
         HistoryResponse historyResponse = new HistoryResponse();

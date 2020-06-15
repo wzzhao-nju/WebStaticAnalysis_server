@@ -13,15 +13,18 @@ public class History {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp timestamp;
 
+    private String filename;
+
     private Integer filecount;
 
     private Integer errorcount;
 
     public History(){}
 
-    public History(String analyzeId, Timestamp timestamp, Integer filecount, Integer errorcount){
+    public History(String analyzeId, Timestamp timestamp, String filename, Integer filecount, Integer errorcount){
         this.analyzeId = analyzeId;
         this.timestamp = timestamp;
+        this.filename = filename;
         this.filecount = filecount;
         this.errorcount = errorcount;
     }
@@ -40,6 +43,14 @@ public class History {
 
     public Timestamp getTimestamp() {
         return timestamp;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     public void setFilecount(Integer filecount) {
