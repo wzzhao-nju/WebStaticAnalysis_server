@@ -1,12 +1,20 @@
 package com.example.message;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.sql.Timestamp;
 
 public class History {
 
     private String analyzeId;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Timestamp timestamp;
+
     private Integer filecount;
+
     private Integer errorcount;
 
     public History(){}
