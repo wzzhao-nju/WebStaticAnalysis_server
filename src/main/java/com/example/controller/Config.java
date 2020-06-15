@@ -16,6 +16,6 @@ public class Config implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry){
         registry.addInterceptor(new LoginHandlerInterceptor(loginInfoRepository))
                 .addPathPatterns("/api/*")
-                .excludePathPatterns("/api/login", "/api/register", "/api/logoff", "/api/loginAsGuest");
+                .excludePathPatterns("/api/login", "/api/register", "/api/loginAsGuest");
     }
 }

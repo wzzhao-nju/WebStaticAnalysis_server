@@ -50,12 +50,13 @@ public class Controller {
 
     //传输代码字符串
     @PostMapping("/api/uploadString")
-    public Message Post(@RequestBody CodeLine codeline, HttpServletRequest request){
+    public Message uploadString(@RequestBody CodeLine codeline, HttpServletRequest request){
         //对字符串进行转存
         String[] code = codeline.getCodeline().split("\n");
         String identity = UUID.randomUUID().toString().replaceAll("-", ""); //由于没有文件名，这里随机生成一个UUID
         Vector<String> filenames = new Vector<>();
         try {
+            log.info("Try to save source code into file");
             File directory = new File(savepath + identity);
             if(!directory.exists()) directory.mkdirs();
             File dst = new File(savepath + identity + "/" + identity + ".cpp");
@@ -65,10 +66,12 @@ public class Controller {
                 writer.write(s + "\n");
             writer.close();
         } catch (IOException e){
+            log.info("Cannot save source code into file");
             e.printStackTrace();
             return new Message(-1, null, "服务器无法缓存您的代码，请联系管理员。");
         }
         filenames.add(identity + ".cpp");
+        log.info(String.format("Downloading finished! Starting analyzing!(analyzeId = %s)", identity));
         //异步调用分析程序进行分析
         Integer uid = (Integer) request.getSession().getAttribute("uid");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -89,17 +92,17 @@ public class Controller {
         }
         //文件是否为空
         if(upload.isEmpty()){
-            log.info(String.format("Logger: file %s is empty", filename));
+            log.info(String.format("Logger: file(%s) is empty!", filename));
             return new Message(-1, null, "文件不能为空！");
         }
         //格式检查
         if(!filename.endsWith(".c") && !filename.endsWith(".cpp") && !filename.endsWith(".h") && !filename.endsWith(".zip")){
-            log.info(String.format("Logger: the format of file %s is wrong!", filename));
+            log.info(String.format("Format of file(%s) is wrong!", filename));
             return new Message(-1, null, "文件格式错误！");
         }
         //转存
         try{
-            log.info(String.format("Logger: Starting to restore file %s", filename));
+            log.info(String.format("Starting to download file %s", filename));
             File dst = new File(savepath + identity + "/" + filename);
             if(!dst.exists()) dst.mkdirs();
             upload.transferTo(dst.getAbsoluteFile());
@@ -123,11 +126,11 @@ public class Controller {
                 filenames.add(filename);
             }
         } catch (IOException | ZipException e){
-            log.info(String.format("Logger: restore file %s failed", filename));
+            log.info("Download failed");
             e.printStackTrace();
             return new Message(-1, null, "服务器无法缓存您的文件，请联系管理员。");
         }
-        log.info(String.format("Logger: download %s finished! Starting analyzing!\n", filename));
+        log.info(String.format("Downloading finished! Starting analyzing!(analyzeId = %s)", identity));
         //异步调用分析程序进行分析
         Integer uid = (Integer) request.getSession().getAttribute("uid");
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -142,6 +145,7 @@ public class Controller {
         if(recordRepository.existsById(id)) {
             response.setStatusCode(0);
             response.setResults(manager.readJsonFinal(savepath + id + "/" + id + "FinalResult"));
+            log.info(String.format("Have result of analyzeId = %s", id));
         }
         return response;
     }
@@ -164,6 +168,7 @@ public class Controller {
             reader.close();
             in.close();
         }catch (IOException e){
+            log.info(String.format("Cannot read file %s", savepath + identity + "/" + filename));
             e.printStackTrace();
         }
         return filetext;
@@ -173,6 +178,8 @@ public class Controller {
     @PostMapping("/api/checkHistory")
     public Vector<History> checkHistory(HttpServletRequest request){
         Integer uid = (Integer) request.getSession().getAttribute("uid");
+        log.info(String.format("Checking record from uid = %d", uid));
+
         List<Record> records = recordRepository.findByUid(uid);
         Vector<History> histories = new Vector<>();
         for(Record record: records)
@@ -196,6 +203,8 @@ public class Controller {
             user.setName(username);
             user.setPassword(password);
             userRepository.save(user);
+
+            log.info(String.format("Congratulations! We have a new user(uid = %d)!", user.getUid()));
             //注册成功后自动登录
             request.getSession().setAttribute("uid", user.getUid());
             LoginInfo loginInfo = new LoginInfo();
@@ -221,12 +230,15 @@ public class Controller {
                 if(infos.size() > 0)
                     for(LoginInfo info: infos)
                         loginInfoRepository.delete(info);
+
                 //设置session, 将登录状态存储到数据库中
                 request.getSession().setAttribute("uid", user.getUid());
                 LoginInfo loginInfo = new LoginInfo();
                 loginInfo.setSessionId(request.getSession().getId());
-                loginInfo.setUid(userRepository.findByName(username).get(0).getUid());
+                loginInfo.setUid(user.getUid());
                 loginInfoRepository.save(loginInfo);
+
+                log.info(String.format("User uid = %d log in", user.getUid()));
                 return new RegisterLoginInfo(0, "登录成功");
             }
             else
@@ -237,16 +249,21 @@ public class Controller {
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
+        log.info("Guest log in");
         return new RegisterLoginInfo(0, "登录成功");
     }
 
     @PostMapping("/api/logoff")
     public RegisterLoginInfo logoff(HttpServletRequest request){
         String sessionId = request.getSession().getId();
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+
         Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
         request.getSession().removeAttribute("uid");
         request.getSession().invalidate();
+
+        if(uid != null) { log.info(String.format("User uid = %d log off", uid)); }
         return new RegisterLoginInfo(0, "注销成功");
     }
 
