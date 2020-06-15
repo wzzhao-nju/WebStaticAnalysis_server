@@ -27,7 +27,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-
+        //拦截器, 主要用于检测是否登录, 如果没有登录, 会拦截该请求并返回http statusCode 430
         Integer uid = (Integer)request.getSession().getAttribute("uid");
         log.info(String.format("Receive a request (URI = %s, uid = %d)", request.getRequestURI(), uid));
 

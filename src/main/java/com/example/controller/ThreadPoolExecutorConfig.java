@@ -14,6 +14,7 @@ public class ThreadPoolExecutorConfig {
 
     @Bean("taskExecutor")
     public Executor taskExecutor() {
+        //配置线程池
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(20);

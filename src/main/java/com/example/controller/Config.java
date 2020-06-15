@@ -14,6 +14,7 @@ public class Config implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry){
+        //配置拦截器
         registry.addInterceptor(new LoginHandlerInterceptor(loginInfoRepository))
                 .addPathPatterns("/api/*")
                 .excludePathPatterns("/api/login", "/api/register", "/api/loginAsGuest");

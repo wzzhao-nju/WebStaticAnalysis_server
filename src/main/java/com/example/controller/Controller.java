@@ -138,6 +138,7 @@ public class Controller {
         return new Message(0, identity);
     }
 
+    //获取分析结果, 这是一个轮询请求
     @PostMapping("/api/getResult")
     public Response getResult(@RequestBody AnalyzeID analyzeID) {
         String id = analyzeID.getAnalyzeID();
@@ -188,6 +189,7 @@ public class Controller {
         return histories;
     }
 
+    //注册, 注册成功后会自动登录
     @PostMapping("/api/register")
     public RegisterLoginInfo register(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
         String username = login.getUsername();
@@ -215,6 +217,7 @@ public class Controller {
         }
     }
 
+    //登录
     @PostMapping("/api/login")
     public RegisterLoginInfo login(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
         String username = login.getUsername();
@@ -248,6 +251,7 @@ public class Controller {
         }
     }
 
+    //游客登录
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
@@ -255,6 +259,7 @@ public class Controller {
         return new RegisterLoginInfo(0, "登录成功");
     }
 
+    //注销
     @PostMapping("/api/logoff")
     public RegisterLoginInfo logoff(HttpServletRequest request){
         String sessionId = request.getSession().getId();
