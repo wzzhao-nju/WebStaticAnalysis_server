@@ -29,7 +29,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 public class Controller {
 
     private static final String savepath = "/home/WSA/toAnalyze/";
-    private static final Logger log = LoggerFactory.getLogger(Controller.class); //用于输出信息
+    private static final Logger log = LoggerFactory.getLogger(Controller.class); //用于输出Log信息
 
     @Autowired
     private Manager manager;
@@ -199,7 +198,6 @@ public class Controller {
             userRepository.save(user);
             //注册成功后自动登录
             request.getSession().setAttribute("uid", user.getUid());
-            setCookie(request, response);
             LoginInfo loginInfo = new LoginInfo();
             loginInfo.setSessionId(request.getSession().getId());
             loginInfo.setUid(user.getUid());
@@ -218,17 +216,13 @@ public class Controller {
             User user = users.get(0);
             String password = login.getPassword();
             if(user.getPassword().equals(password)) {
-                System.out.print("uid="+user.getUid()+"\n");
                 //如果重复登录, 顶掉前面的人
                 List<LoginInfo> infos = loginInfoRepository.findByUid(user.getUid());
                 if(infos.size() > 0)
                     for(LoginInfo info: infos)
                         loginInfoRepository.delete(info);
                 //设置session, 将登录状态存储到数据库中
-                System.out.print(request.getSession().getId()+"\n");
-                System.out.print("att1:"+request.getSession().getAttribute("uid"));
                 request.getSession().setAttribute("uid", user.getUid());
-                System.out.print("att2:"+request.getSession().getAttribute("uid"));
                 LoginInfo loginInfo = new LoginInfo();
                 loginInfo.setSessionId(request.getSession().getId());
                 loginInfo.setUid(userRepository.findByName(username).get(0).getUid());
@@ -240,54 +234,20 @@ public class Controller {
         }
     }
 
-    @PostMapping("/api/test")
-    public RegisterLoginInfo test(@RequestBody Login login, HttpServletRequest request, HttpServletResponse response){
-        System.out.print("/api/test\n");
-        System.out.print("/api/test id:" + request.getSession().getId()+"\n");
-        if(request.getSession().getAttribute("uid")==null)
-            System.out.print("not attribute!\n");
-        else
-            System.out.print("has attribute\n");
-        if(request.getSession().getAttribute("test")!=null)
-            System.out.print("has test\n");
-        request.getSession().setAttribute("test", "test");
-        System.out.print("setAttribute done!\n");
-        return new RegisterLoginInfo(0, "这是一个测试");
-    }
-
     @PostMapping("/api/loginAsGuest")
     public RegisterLoginInfo loginAsGuest(HttpServletRequest request, HttpServletResponse response){
         request.getSession().setAttribute("uid", -1);
-        //setCookie(request, response);
-        /*
-        LoginInfo loginInfo = new LoginInfo();
-        loginInfo.setSessionId(request.getSession().getId());
-        loginInfo.setUid(-1);
-        loginInfoRepository.save(loginInfo);
-        */
         return new RegisterLoginInfo(0, "登录成功");
     }
 
     @PostMapping("/api/logoff")
     public RegisterLoginInfo logoff(HttpServletRequest request){
-        System.out.print("att:"+request.getSession().getAttribute("uid"));
         String sessionId = request.getSession().getId();
         Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
         request.getSession().removeAttribute("uid");
         request.getSession().invalidate();
         return new RegisterLoginInfo(0, "注销成功");
-    }
-
-    public void setCookie(HttpServletRequest request, HttpServletResponse response){
-        String sessionId = request.getSession().getId();
-        Cookie cookie = new Cookie("JSESSIONID", sessionId);
-        cookie.setDomain("118.89.104.33");
-        cookie.setPath("/");
-        response.addCookie(cookie);
-        response.setHeader("Access-Control-Expose-Headers","MyCookie");
-        response.setHeader("Access-Control-Allow-Headers","MyCookie");
-        response.setHeader("MyCookie", "JSESSIONID="+sessionId);
     }
 
 }

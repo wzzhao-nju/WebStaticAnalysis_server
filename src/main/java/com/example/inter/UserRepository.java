@@ -3,7 +3,6 @@ package com.example.inter;
 import org.springframework.data.repository.CrudRepository;
 
 import com.example.entity.User;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 

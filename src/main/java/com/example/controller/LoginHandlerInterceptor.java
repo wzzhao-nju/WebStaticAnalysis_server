@@ -23,25 +23,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
-/*
-        //配置跨域
-        String origin = request.getHeader("Origin");
-        if(origin == null) {
-            origin = request.getHeader("Referer");
-        }
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Headers", "content-type");
-        response.setHeader("Access-Control-Allow-Origin", origin);*/
-
-
-        System.out.print("111:" + request.getSession().getId() + "\n");
         Integer uid = (Integer)request.getSession().getAttribute("uid");
         response.setCharacterEncoding("UTF-8");
         try {
             if(uid == null) {
-                System.out.print("uid is null\n");
                 response.setStatus(430);
                 response.getWriter().append("请先登录");
                 return false;
@@ -52,8 +37,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             if(loginInfoList.size() <= 0 || loginInfoList.get(0).getSessionId().equals(request.getSession().getId()))
                 return true;
             else{
-                System.out.print("sessionId:"+request.getSession().getId()+"\n");
-                System.out.print("database:" + loginInfoList.get(0).getSessionId() + "\n");
                 response.setStatus(430);
                 response.getWriter().append("登录已过期, 或者已在其他地方登录");
                 return false;
