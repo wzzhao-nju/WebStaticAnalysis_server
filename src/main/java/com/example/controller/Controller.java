@@ -277,8 +277,8 @@ public class Controller {
         Optional<LoginInfo> loginInfo = loginInfoRepository.findById(sessionId);
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
         request.getSession().removeAttribute("uid");
-        request.getSession().invalidate();
-        sessionStatus.setComplete();
+        //request.getSession().invalidate();
+        //sessionStatus.setComplete();
 
         if(uid != null) { log.info(String.format("User uid = %d log off", uid)); }
         return new RegisterLoginInfo(0, "注销成功");
