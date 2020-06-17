@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -269,7 +270,7 @@ public class Controller {
 
     //注销
     @PostMapping("/api/logoff")
-    public RegisterLoginInfo logoff(HttpServletRequest request){
+    public RegisterLoginInfo logoff(HttpServletRequest request, SessionStatus sessionStatus){
         String sessionId = request.getSession().getId();
         Integer uid = (Integer) request.getSession().getAttribute("uid");
 
@@ -277,6 +278,7 @@ public class Controller {
         loginInfo.ifPresent(info -> loginInfoRepository.delete(info));
         request.getSession().removeAttribute("uid");
         request.getSession().invalidate();
+        sessionStatus.setComplete();
 
         if(uid != null) { log.info(String.format("User uid = %d log off", uid)); }
         return new RegisterLoginInfo(0, "注销成功");
