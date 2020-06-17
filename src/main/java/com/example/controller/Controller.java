@@ -282,4 +282,14 @@ public class Controller {
         return new RegisterLoginInfo(0, "注销成功");
     }
 
+    @PostMapping("/api/whoIam")
+    public Person whoIam(HttpServletRequest request){
+        Integer uid = (Integer) request.getSession().getAttribute("uid");
+        if(uid == -1)
+            return new Person(-1, "Guest");
+        else {
+            Optional<User> user = userRepository.findById(uid);
+            return user.map(value -> new Person(0, value.getName())).orElseGet(() -> new Person(-1, "something wrong!"));
+        }
+    }
 }
