@@ -289,7 +289,14 @@ public class Controller {
             return new Person(-1, "Guest");
         else {
             Optional<User> user = userRepository.findById(uid);
-            return user.map(value -> new Person(0, value.getName())).orElseGet(() -> new Person(-1, "something wrong!"));
+            if(user.isPresent()) {
+                log.info(String.format("username = %s", user.get().getName()));
+                return new Person(0, user.get().getName());
+            }
+            else {
+                log.info("Error! Cannot find this user");
+                return new Person(-2, "something wrong!");
+            }
         }
     }
 }
