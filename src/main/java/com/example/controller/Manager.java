@@ -59,6 +59,7 @@ public class Manager {
         //逐个文件收集缺陷信息
         Vector<Result> results = new Vector<>();
         for(DefectIntheSameFile disf: disfs) {
+            if(disf.getFilename().endsWith(".tcc")) continue;
             Result result = readFile(disf.getDefects());
             result.setFilename(disf.getFilename());
             results.add(result);
